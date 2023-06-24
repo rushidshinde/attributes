@@ -1,4 +1,4 @@
-# Disable scroll of page using attribute
+# Disable scrolling using attributes
 
 Copy the Disable Scrolling ```<script>``` and paste into the ```<head>``` or ```<body>``` of your page
 
