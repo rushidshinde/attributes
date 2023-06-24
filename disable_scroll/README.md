@@ -4,7 +4,7 @@ Copy the Disable Scrolling ```<script>``` and paste into the ```<head>``` or ```
 
 ```
 <!-- [attributes by RS] Disabled Scroll -->
-<script>let e=document.querySelectorAll('[rs-scroll-element="enable"], [rs-scroll-element="enable"] *'),d=document.querySelectorAll('[rs-scroll-element="disable"], [rs-scroll-element="disable"] *');function o(l){l?document.body.style.overflow="hidden":document.body.removeAttribute("style")}e.forEach(function(l){l.addEventListener("click",function(){o(!1)})}),d.forEach(function(l){l.addEventListener("click",function(){o(!0)})});</script>
+<script async src="https://rushidshinde.github.io/attributes/disable_scroll/disable_scroll.min.js" type="text/javascript" crossorigin="anonymous"></script>
 ```
 
 Add a custom attribute to an element that, when clicked, will toggle the scrolling behavior of the page, enabling or disabling it. 
