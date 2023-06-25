@@ -8,7 +8,7 @@ Copy the Disable Scrolling ```<script>``` and paste into the ```<head>``` or ```
 ```
 ## Documentation
 Enhance an element by introducing a custom attribute that, upon being clicked, toggles the scrolling behavior of the page, enabling or disabling it accordingly.
-
+#
 ### Disable scrolling 
 Name: 
 ```
