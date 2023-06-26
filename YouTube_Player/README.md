@@ -1,6 +1,6 @@
 # Embed YouTube videos using attributes
 
-Copy the YouTube Player ```<script>``` and paste into the ```<head>``` or ```<body>``` of your page
+Copy the YouTube Player ```<script>``` and paste into the ```<body>``` of your page
 ```
 <!-- [attributes by RS] YouTube Player -->
 <script async src="https://rushidshinde.github.io/attributes/YouTube_Player/youTube_Player.min.js" type="text/javascript" crossorigin="anonymous"></script>
