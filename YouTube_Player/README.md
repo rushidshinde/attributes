@@ -25,7 +25,7 @@ Where to add:  Add this attribute to element where you want to embed player
 
 Name:
 ```
-rs-yt-videoId 
+rs-yt-videoId
 ```
 value: [https://youtu.be/ ```mUxzKVrSAjs``` ]
 ``` 
