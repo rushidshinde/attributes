@@ -23,7 +23,8 @@ Where to add:  Add this attribute to all the input fields you want to validate
 
 ### input field type
 
-set the custom field type so that the patterns will validate according to type
+set the custom field type so that the patterns will validate accordingly
+
 ```Required*```
 
 Name:
@@ -35,12 +36,12 @@ value:
 businessEmail
 ```
 
-Note: The important not is that to add the type value as the key of the patterns 
+Note: The important note is that to add the type value as the key of the patterns 
 For custom type add a key value pair of type and pattern in patterns object
 
 ### input field patterns
 
-There are default patterns added in script if you want to add custom pattern add using
+There are default patterns added in script if you want to add custom pattern append in this object
 
 ```
 const patterns = {
