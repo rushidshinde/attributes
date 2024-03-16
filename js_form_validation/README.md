@@ -3,7 +3,7 @@
 Copy the validation ```<script>``` and paste into ```<body>``` of your page
 ```
 <!-- [attributes by RS] Javascript Validation -->
-<script async src="https://rushidshinde.github.io/attributes/YouTube_Player/youTube_Player.min.js" type="text/javascript" crossorigin="anonymous"></script>
+<script async src="https://rushidshinde.github.io/attributes/js_form_validation/validation_script.min.js" type="text/javascript" crossorigin="anonymous"></script>
 ```
 ## Documentation
 Validate input fields using regex patterns   
