@@ -3,7 +3,7 @@
 Copy the Tabs ```<script>``` and paste into the ```<head>``` or ```<body>``` of your page
 ```
 <!-- [attributes by RS] Tabs -->
-<script async src="https://rushidshinde.github.io/attributes/Tabs/tabs.min.js" type="text/javascript" crossorigin="anonymous"></script>
+<script src="https://rushidshinde.github.io/attributes/Tabs/tabs.min.js" type="text/javascript" crossorigin="anonymous"></script>
 ```
 ## Documentation
 Embed Tabs using attributes
