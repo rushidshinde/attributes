@@ -74,3 +74,28 @@ value:
 ``` 
 default is "Please enter valid data"
 ```
+Validate checkbox fields for multiselect options   
+#
+### checkbox field wrapper
+```Required*```
+
+Name:
+```
+rs-form-field
+```
+value: 
+```
+checkbox-wrapper
+```
+Where to add:  Add this attribute to wrapper of the all checkbox fields
+### checkbox field wrapper
+```Required*```
+
+Name:
+```
+rs-checkbox-multi-select
+```
+value: 
+```
+true
+```
