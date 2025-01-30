@@ -87,8 +87,6 @@ value:
 ```
 checkbox-wrapper
 ```
-Where to add:  Add this attribute to wrapper of the all checkbox fields
-### checkbox field wrapper
 ```Required*```
 
 Name:
@@ -99,3 +97,4 @@ value:
 ```
 true
 ```
+Where to add:  Add this attribute to wrapper of the all checkbox fields
