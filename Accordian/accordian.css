@@ -22,10 +22,8 @@
   transform: rotate(180deg);
 }
 
-/* Optional style changes */
-.is-active-accordian[rs-accordion-element="trigger"] {
-  font-weight: 400;
-  color: #0a58ca;
+[rs-accordion-element="trigger"] {
+  cursor: pointer;
 }
 
 @keyframes expandAccordion {
