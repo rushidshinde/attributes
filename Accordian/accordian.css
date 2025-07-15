@@ -1,0 +1,38 @@
+/* Hide content by default */
+[rs-accordion-element="content"] {
+  height: 0;
+  overflow: hidden;
+  transition: height 0.3s ease;
+}
+
+/* Expand content when active */
+.is-active-accordian[rs-accordion-element="content"] {
+  height: auto; /* Allows content to grow */
+  /* Optional if using JS to animate height via max-height instead */
+  animation: expandAccordion 0.3s ease forwards;
+}
+
+/* Rotate arrow */
+[rs-accordion-element="arrow"] {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.is-active-accordian[rs-accordion-element="arrow"] {
+  transform: rotate(180deg);
+}
+
+/* Optional style changes */
+.is-active-accordian[rs-accordion-element="trigger"] {
+  font-weight: 400;
+  color: #0a58ca;
+}
+
+@keyframes expandAccordion {
+  from {
+    height: 0;
+  }
+  to {
+    height: auto;
+  }
+}
