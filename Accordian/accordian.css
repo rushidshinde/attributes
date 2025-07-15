@@ -2,35 +2,25 @@
 [rs-accordion-element="content"] {
   height: 0;
   overflow: hidden;
-  transition: height 0.3s ease;
+  display: none;
 }
 
-/* Expand content when active */
+/* Show content instantly when active */
 .is-active-accordian[rs-accordion-element="content"] {
-  height: auto; /* Allows content to grow */
-  /* Optional if using JS to animate height via max-height instead */
-  animation: expandAccordion 0.3s ease forwards;
+  height: auto;
+  display: block;
 }
 
-/* Rotate arrow */
+/* Rotate arrow instantly */
 [rs-accordion-element="arrow"] {
   display: inline-block;
-  transition: transform 0.3s ease;
 }
 
 .is-active-accordian[rs-accordion-element="arrow"] {
   transform: rotate(180deg);
 }
 
+/* Optional: Pointer for trigger */
 [rs-accordion-element="trigger"] {
   cursor: pointer;
-}
-
-@keyframes expandAccordion {
-  from {
-    height: 0;
-  }
-  to {
-    height: auto;
-  }
 }
