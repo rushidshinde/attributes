@@ -26,12 +26,12 @@ Add the relevant script before the closing `</body>` tag in your HTML:
  
 ```
 <!-- [attributes by RS] Custom Fade-In Animation -->
-<script async src="https://rushidshinde.github.io/attributes/Fade_In/fade.min.js" type="text/javascript" crossorigin="anonymous"></script>
+<script src="https://rushidshinde.github.io/attributes/Fade_In/fade.min.js" type="text/javascript" crossorigin="anonymous"></script>
 ```
 or 
 ```
 <!-- [attributes by RS] Custom Fade-Transform Animation -->
-<script async src="https://rushidshinde.github.io/attributes/Fade_In/fade_transform.min.js" type="text/javascript" crossorigin="anonymous"></script>
+<script src="https://rushidshinde.github.io/attributes/Fade_In/fade_transform.min.js" type="text/javascript" crossorigin="anonymous"></script>
 ```
 
 ### 2. Mark Elements for Animation
