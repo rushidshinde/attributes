@@ -12,47 +12,55 @@
     // === OPEN BUTTON ===
     if (attr.startsWith("open-")) {
       const modalId = attr.replace("open-", "modal-");
+      const modal = document.querySelector(`[rs-modal-element="${modalId}"]`);
+      if (!modal) return;
+
       el.setAttribute("role", "button");
-      el.setAttribute("aria-controls", modalId);
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("aria-controls", modal.id || `${modalId}-popup`);
       el.setAttribute("aria-expanded", "false");
+      el.setAttribute("aria-haspopup", "dialog");
+      el.setAttribute("aria-roledescription", "open-modal-trigger");
 
       el.addEventListener("click", () => {
-        const modal = document.querySelector(`[rs-modal-element="${modalId}"]`);
-        if (!modal) return;
-
-        // Open modal
         modal.classList.add("rsOpenModalPopUp");
         document.documentElement.style.overflow = "hidden";
         document.body.style.overflow = "hidden";
         modal.focus();
         el.setAttribute("aria-expanded", "true");
       });
+
       el.style.cursor = "pointer";
     }
 
     // === MODAL WRAPPER ===
     if (attr.startsWith("modal-")) {
-      el.setAttribute("role", "dialog");
-      el.setAttribute("aria-modal", "true");
-      el.setAttribute("tabindex", "-1");
+      el.setAttribute("role", el.getAttribute("role") || "dialog");
+      el.setAttribute("aria-modal", el.getAttribute("aria-modal") || "true");
+      el.setAttribute("tabindex", el.getAttribute("tabindex") || "-1");
 
-      const modalId = attr;
-      el.setAttribute("aria-labelledby", `${modalId}-title`);
-      el.setAttribute("aria-describedby", `${modalId}-desc`);
+      const modalId = el.getAttribute("id") || `${attr}-popup`;
+      el.id = modalId;
+
+      if (!el.hasAttribute("aria-labelledby")) el.setAttribute("aria-labelledby", `${attr}-heading`);
+      if (!el.hasAttribute("aria-describedby")) el.setAttribute("aria-describedby", `${attr}-desc`);
     }
 
     // === CLOSE BUTTON ===
     if (attr.startsWith("close-")) {
+      const modalId = attr.replace("close-", "modal-");
+      const modal = document.querySelector(`[rs-modal-element="${modalId}"]`);
+      if (!modal) return;
+
       el.setAttribute("role", "button");
-      el.setAttribute("aria-label", "Close Modal");
+      el.setAttribute("tabindex", "0");
+      el.setAttribute("aria-controls", modal.id || `${modalId}-popup`);
+      el.setAttribute("aria-label", el.getAttribute("aria-label") || "Close modal");
+      el.setAttribute("aria-haspopup", "dialog");
+      el.setAttribute("aria-roledescription", "close-modal-trigger");
 
       el.addEventListener("click", () => {
-        const modalAttr = attr.replace("close-", "modal-");
-        const modal = document.querySelector(`[rs-modal-element="${modalAttr}"]`);
-        if (!modal) return;
-
-        // Close modal
-        closeModal(modal, modalAttr);
+        closeModal(modal, modalId);
       });
       el.style.cursor = "pointer";
     }
