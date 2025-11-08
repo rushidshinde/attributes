@@ -22,6 +22,8 @@
 
         // Open modal
         modal.classList.add("rsOpenModalPopUp");
+        document.documentElement.style.overflow = "hidden";
+        document.body.style.overflow = "hidden";
         modal.focus();
         el.setAttribute("aria-expanded", "true");
       });
@@ -65,6 +67,10 @@
         iframe.setAttribute("src", iframe.getAttribute("src"));
       }
     });
+
+    // Restore page scroll
+    document.documentElement.style.overflowY = "auto";
+    document.body.style.overflowY = "auto";
 
     // Update open button state
     const openBtn = document.querySelector(`[rs-modal-element="open-${modalAttr.replace("modal-", "")}"]`);
