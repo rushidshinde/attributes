@@ -1,34 +1,7 @@
 (function () {
   // Inject base and visible styles
   const style = document.createElement("style");
-  style.textContent = `
-    [rs-modal-element^="modal-"] {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      width: 100%;
-      height: 100vh;
-      overflow: hidden;
-      opacity: 0;
-      pointer-events: none;
-      visibility: hidden;
-      z-index: -1;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.3s ease, visibility 0.3s ease, z-index 0.3s ease;
-    }
-
-    [rs-modal-element^="modal-"].rsOpenModalPopUp {
-      opacity: 1;
-      pointer-events: auto;
-      visibility: visible;
-      z-index: 9999;         
-    }
-  `;
+  style.textContent = `[rs-modal-element^="modal-"] { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100vh; overflow: hidden; opacity: 0; pointer-events: none; visibility: hidden; z-index: -1; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; transition: opacity 0.3s ease, visibility 0.3s ease, z-index 0.3s ease; } [rs-modal-element^="modal-"].rsOpenModalPopUp { opacity: 1; pointer-events: auto; visibility: visible; z-index: 9999; }`;
   document.head.appendChild(style);
 
   const modalElements = document.querySelectorAll("[rs-modal-element]");
@@ -77,33 +50,34 @@
         if (!modal) return;
 
         // Close modal
-        modal.classList.remove("rsOpenModalPopUp");
-
-        // Reset iframe sources
-        modal.querySelectorAll("iframe").forEach((iframe) => {
-          if (iframe.hasAttribute("src")) {
-            iframe.setAttribute("src", iframe.getAttribute("src"));
-          }
-        });
-
-        // Update open button state
-        const openBtn = document.querySelector(`[rs-modal-element="open-${modalAttr.replace("modal-", "")}"]`);
-        if (openBtn) openBtn.setAttribute("aria-expanded", "false");
+        closeModal(modal, modalAttr);
       });
       el.style.cursor = "pointer";
     }
   });
+
+  function closeModal(modal, modalAttr) {
+    modal.classList.remove("rsOpenModalPopUp");
+
+    // Reset iframe sources to stop video playback
+    modal.querySelectorAll("iframe").forEach((iframe) => {
+      if (iframe.hasAttribute("src")) {
+        iframe.setAttribute("src", iframe.getAttribute("src"));
+      }
+    });
+
+    // Update open button state
+    const openBtn = document.querySelector(`[rs-modal-element="open-${modalAttr.replace("modal-", "")}"]`);
+    if (openBtn) openBtn.setAttribute("aria-expanded", "false");
+  }
 
   // === ESC KEY CLOSE ===
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
       document.querySelectorAll("[rs-modal-element^='modal-']").forEach((modal) => {
         if (modal.classList.contains("rsOpenModalPopUp")) {
-          modal.classList.remove("rsOpenModalPopUp");
-
-          const id = modal.getAttribute("rs-modal-element").replace("modal-", "");
-          const openBtn = document.querySelector(`[rs-modal-element="open-${id}"]`);
-          if (openBtn) openBtn.setAttribute("aria-expanded", "false");
+          const modalAttr = modal.getAttribute("rs-modal-element");
+          closeModal(modal, modalAttr);
         }
       });
     }
