@@ -1,10 +1,21 @@
 # Create Modal Popups using attributes
 
 Copy the YouTube Player ```<script>``` and paste into the ```<head>``` or ```<body>``` of your page
+
+### Default Version
+This version hides modals using `display: none`.
+
 ```
 <!-- [attributes by RS] Modal -->
 <script async src="https://rushidshinde.github.io/attributes/Modal/modal.min.js" type="text/javascript" crossorigin="anonymous"></script>
 ```
+### ⚡ Modal v2 (Keep Elements Alive in DOM)
+
+```
+<!-- [attributes by RS] Modal v2 -->
+<script async src="https://rushidshinde.github.io/attributes/Modal/modal@2.min.js" type="text/javascript" crossorigin="anonymous"></script>
+```
+
 ## Documentation
 Create Modals using attributes
 #
