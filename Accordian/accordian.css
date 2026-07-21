@@ -1,19 +1,19 @@
-/* Hide content by default */
+/* Content is always in flow, just collapsed */
 [rs-accordion-element="content"] {
-  height: 0;
+  max-height: 0;
   overflow: hidden;
-  display: none;
+  transition: max-height 0.35s ease;
 }
 
-/* Show content instantly when active */
+/* JS will set an explicit max-height in px when opening */
 .is-active-accordian[rs-accordion-element="content"] {
-  height: auto;
-  display: block;
+  /* max-height set dynamically via JS */
 }
 
-/* Rotate arrow instantly */
+/* Smooth arrow rotation */
 [rs-accordion-element="arrow"] {
   display: inline-block;
+  transition: transform 0.35s ease;
 }
 
 .is-active-accordian[rs-accordion-element="arrow"] {
