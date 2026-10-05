@@ -98,7 +98,6 @@ const patterns = {
 
       @media (max-width: 370px) {
         .rs-validation-bubble {
-          width: 70vw;
           max-width: 70vw;
         }
       }
