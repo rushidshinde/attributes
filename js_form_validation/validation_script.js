@@ -55,7 +55,7 @@ const patterns = {
         --rs-bubble-bg: #ffffff;
         --rs-bubble-color: #202124;
         --rs-bubble-font-size: 13px;
-        --rs-bubble-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --rs-bubble-font-family: inherit, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         --rs-bubble-border-color: #dadce0;
         --rs-bubble-border-radius: 5px;
         --rs-bubble-shadow: 0 4px 14px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
