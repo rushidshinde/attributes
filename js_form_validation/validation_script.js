@@ -50,27 +50,57 @@ const patterns = {
     const style = document.createElement("style");
     style.id = "rs-validation-bubble-styles";
     style.textContent = `
+      :root {
+        --rs-bubble-bg: #ffffff;
+        --rs-bubble-color: #202124;
+        --rs-bubble-font-size: 13px;
+        --rs-bubble-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --rs-bubble-border-color: #dadce0;
+        --rs-bubble-border-radius: 5px;
+        --rs-bubble-shadow: 0 4px 14px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+        --rs-bubble-icon-bg: #e65100;
+        --rs-bubble-icon-color: #ffffff;
+        --rs-bubble-max-width: 320px;
+        --rs-bubble-padding: 8px 12px;
+        --rs-input-invalid-border: #d93025;
+      }
+
       .rs-validation-bubble {
         position: absolute;
         z-index: 999999;
         display: none;
         align-items: center;
         gap: 8px;
-        background: #ffffff;
-        color: #202124;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        font-size: 13px;
+        background: var(--rs-bubble-bg, #ffffff);
+        color: var(--rs-bubble-color, #202124);
+        font-family: var(--rs-bubble-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+        font-size: var(--rs-bubble-font-size, 13px);
         line-height: 1.4;
-        padding: 8px 12px;
-        border-radius: 6px;
-        border: 1px solid #dadce0;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18), 0 1px 3px rgba(0, 0, 0, 0.08);
+        padding: var(--rs-bubble-padding, 8px 12px);
+        border-radius: var(--rs-bubble-border-radius, 5px);
+        border: 1px solid var(--rs-bubble-border-color, #dadce0);
+        box-shadow: var(--rs-bubble-shadow, 0 4px 14px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08));
         pointer-events: auto;
         opacity: 0;
         transform: translateY(4px);
         transition: opacity 0.15s ease, transform 0.15s ease;
-        max-width: min(340px, calc(100vw - 28px));
+        width: max-content;
+        max-width: min(calc(100vw - 24px), var(--rs-bubble-max-width, 320px));
         box-sizing: border-box;
+      }
+
+      @media (max-width: 480px) {
+        .rs-validation-bubble {
+          --rs-bubble-font-size: 12px;
+          --rs-bubble-padding: 6px 10px;
+        }
+      }
+
+      @media (max-width: 370px) {
+        .rs-validation-bubble {
+          width: 70vw;
+          max-width: 70vw;
+        }
       }
 
       .rs-validation-bubble.rs-visible {
@@ -81,18 +111,17 @@ const patterns = {
 
       .rs-bubble-icon {
         flex-shrink: 0;
-        width: 16px;
-        height: 16px;
+        width: 18px;
+        height: 18px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #ea8600;
       }
 
       .rs-bubble-icon svg {
-        width: 16px;
-        height: 16px;
-        fill: currentColor;
+        width: 18px;
+        height: 18px;
+        display: block;
       }
 
       .rs-bubble-message {
@@ -106,9 +135,10 @@ const patterns = {
         position: absolute;
         width: 8px;
         height: 8px;
-        background: #ffffff;
-        border: 1px solid #dadce0;
+        background: var(--rs-bubble-bg, #ffffff);
+        border: 1px solid var(--rs-bubble-border-color, #dadce0);
         transform: rotate(45deg);
+        z-index: 2;
       }
 
       /* When bubble is below target (arrow points UP) */
@@ -127,7 +157,7 @@ const patterns = {
 
       /* Input highlighting for error state */
       .rs-input-invalid {
-        border-color: #d93025 !important;
+        border-color: var(--rs-input-invalid-border, #d93025) !important;
       }
     `;
     document.head.appendChild(style);
@@ -152,13 +182,13 @@ const patterns = {
       bubble.setAttribute("role", "alert");
       bubble.setAttribute("aria-live", "assertive");
 
-      // Warning icon (circle with exclamation point, matching native browser style)
+      // Warning icon (orange square badge with white exclamation point matching native browser style)
       const icon = document.createElement("div");
       icon.className = "rs-bubble-icon";
       icon.innerHTML = `
-        <svg viewBox="0 0 16 16">
-          <path d="M8 1a7 7 0 1 0 7 7A7.008 7.008 0 0 0 8 1zm0 12.5A5.5 5.5 0 1 1 13.5 8 5.506 5.506 0 0 1 8 13.5z"/>
-          <path d="M7.25 4.5h1.5v4.5h-1.5zm0 5.75h1.5v1.5h-1.5z"/>
+        <svg viewBox="0 0 20 20" width="18" height="18">
+          <rect width="20" height="20" rx="3.5" fill="var(--rs-bubble-icon-bg, #e65100)"/>
+          <path d="M9 4.5h2v6.5H9zm0 8.5h2v2H9z" fill="var(--rs-bubble-icon-color, #ffffff)"/>
         </svg>
       `;
 
@@ -250,10 +280,10 @@ const patterns = {
         this.bubbleEl.classList.add("rs-bubble-bottom");
       }
 
-      // Calculate horizontal positioning (anchor to target left with fallback for small screens)
-      let left = scrollX + targetRect.left + 16;
-      const maxLeft = scrollX + viewportWidth - bubbleRect.width - 14;
-      const minLeft = scrollX + 14;
+      // Calculate horizontal positioning: left-align bubble directly with the target field
+      let left = scrollX + targetRect.left;
+      const maxLeft = scrollX + viewportWidth - bubbleRect.width - 12;
+      const minLeft = scrollX + 12;
 
       if (left > maxLeft) left = maxLeft;
       if (left < minLeft) left = minLeft;
@@ -261,9 +291,9 @@ const patterns = {
       this.bubbleEl.style.top = `${Math.round(top)}px`;
       this.bubbleEl.style.left = `${Math.round(left)}px`;
 
-      // Position arrow relative to the target center
-      const targetCenter = scrollX + targetRect.left + Math.min(30, targetRect.width / 2);
-      let arrowLeft = targetCenter - left - 4;
+      // Position arrow relative to the target field start
+      const targetAnchor = scrollX + targetRect.left + Math.min(24, targetRect.width / 2);
+      let arrowLeft = targetAnchor - left - 4;
       arrowLeft = Math.max(12, Math.min(arrowLeft, bubbleRect.width - 20));
       this.arrowEl.style.left = `${Math.round(arrowLeft)}px`;
     },

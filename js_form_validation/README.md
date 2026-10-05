@@ -99,3 +99,48 @@ value:
 true
 ```
 Where to add:  Add this attribute to wrapper of the all checkbox fields
+
+---
+
+## Custom Styling with CSS Variables
+
+The custom error popup bubble automatically inherits default browser aesthetics and auto-resizes across screen sizes. You can easily override colors, font size, and background using CSS variables in your stylesheet:
+
+```css
+:root {
+  /* Bubble background and text */
+  --rs-bubble-bg: #ffffff;
+  --rs-bubble-color: #202124;
+  --rs-bubble-font-size: 13px;
+  --rs-bubble-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* Borders and shadows */
+  --rs-bubble-border-color: #dadce0;
+  --rs-bubble-border-radius: 5px;
+  --rs-bubble-shadow: 0 4px 14px rgba(0, 0, 0, 0.16), 0 1px 3px rgba(0, 0, 0, 0.08);
+  
+  /* Warning icon */
+  --rs-bubble-icon-bg: #e65100;
+  --rs-bubble-icon-color: #ffffff;
+  
+  /* Dimensions and padding */
+  --rs-bubble-max-width: 150px;
+  --rs-bubble-padding: 8px 12px;
+  
+  /* Field invalid border color */
+  --rs-input-invalid-border: #d93025;
+}
+```
+
+### Dark Mode Example
+```css
+@media (prefers-color-scheme: dark) {
+  :root {
+    --rs-bubble-bg: #1e293b;
+    --rs-bubble-color: #f8fafc;
+    --rs-bubble-border-color: #334155;
+    --rs-bubble-icon-bg: #f97316;
+    --rs-bubble-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+}
+```
