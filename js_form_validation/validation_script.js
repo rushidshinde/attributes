@@ -436,26 +436,76 @@ const patterns = {
   };
 
   /**
-   * Sets the disabled state on a button or element (supporting button, input, a, div).
+   * Applies the disabled state and explicit disabled attribute to a button.
+   * Supports <button>, <input>, <a>, <div>, etc.
+   * @param {HTMLElement} btn
+   */
+  const applyDisabled = (btn) => {
+    if (!btn) return;
+    btn.setAttribute("disabled", "true");
+    btn.setAttribute("aria-disabled", "true");
+    btn.classList.add("rs-disabled");
+    if ("disabled" in btn) {
+      btn.disabled = true;
+    }
+  };
+
+  /**
+   * Removes the disabled state and disabled attribute from a button.
+   * @param {HTMLElement} btn
+   */
+  const removeDisabled = (btn) => {
+    if (!btn) return;
+    btn.removeAttribute("disabled");
+    btn.removeAttribute("aria-disabled");
+    btn.classList.remove("rs-disabled");
+    if ("disabled" in btn) {
+      btn.disabled = false;
+    }
+  };
+
+  /**
+   * Toggles the disabled state of a button.
    * @param {HTMLElement} btn
    * @param {boolean} isDisabled
    */
   const setButtonDisabledState = (btn, isDisabled) => {
-    if (!btn) return;
-
-    if (btn.tagName === "BUTTON" || btn.tagName === "INPUT") {
-      btn.disabled = isDisabled;
-    }
-
     if (isDisabled) {
-      btn.setAttribute("disabled", "true");
-      btn.setAttribute("aria-disabled", "true");
-      btn.classList.add("rs-disabled");
+      applyDisabled(btn);
     } else {
-      btn.removeAttribute("disabled");
-      btn.removeAttribute("aria-disabled");
-      btn.classList.remove("rs-disabled");
+      removeDisabled(btn);
     }
+  };
+
+  /**
+   * Checks whether a step container is currently visible/active in the DOM.
+   * @param {HTMLElement} stepEl
+   * @returns {boolean}
+   */
+  const isStepVisible = (stepEl) => {
+    if (!stepEl) return false;
+    if (stepEl.getAttribute("aria-hidden") === "true") return false;
+    if (stepEl.getAttribute("aria-hidden") === "false") return true;
+
+    if (
+      stepEl.classList.contains("active") ||
+      stepEl.classList.contains("rs-step-active") ||
+      stepEl.classList.contains("current") ||
+      stepEl.classList.contains("w--tab-active")
+    ) {
+      return true;
+    }
+
+    if (stepEl.style.display === "none") return false;
+
+    try {
+      const style = window.getComputedStyle(stepEl);
+      if (style.display === "none" || style.visibility === "hidden") {
+        return false;
+      }
+    } catch (e) {}
+
+    return true;
   };
 
   /**
@@ -540,12 +590,28 @@ const patterns = {
    * @param {HTMLElement} stepEl
    */
   const updateStepNextButton = (stepEl) => {
+    if (!stepEl) return;
     const nextBtns = getStepNextButtons(stepEl);
     if (nextBtns.length === 0) return;
 
     const isValid = validateStepFields(stepEl);
     nextBtns.forEach((btn) => {
-      setButtonDisabledState(btn, !isValid);
+      const isInside = stepEl.contains(btn);
+      const stepVal = stepEl.getAttribute("rs-form-step");
+      const isLinked =
+        btn.getAttribute("rs-form-step") === stepVal ||
+        btn.getAttribute("rs-step-target") === stepVal;
+
+      if (isInside || isLinked) {
+        // Exclusively belongs to this step container
+        setButtonDisabledState(btn, !isValid);
+      } else {
+        // Shared Next button outside all step wrappers:
+        // Only update based on this step if this step is currently visible/active
+        if (isStepVisible(stepEl)) {
+          setButtonDisabledState(btn, !isValid);
+        }
+      }
     });
   };
 
@@ -561,6 +627,12 @@ const patterns = {
     );
     // Find all steps regardless of nesting depth inside forms
     const stepElements = document.querySelectorAll("[rs-form-step]");
+    const allNextButtons = document.querySelectorAll('[rs-step-btn="next"]');
+
+    // 1. Strict default: explicitly add disabled attribute to every Next button on initialization
+    allNextButtons.forEach((btn) => {
+      applyDisabled(btn);
+    });
 
     // Track unique forms to attach submit listeners
     const forms = new Set();
@@ -573,7 +645,7 @@ const patterns = {
         if (!nextBtn) return;
 
         const isBtnDisabled =
-          nextBtn.disabled ||
+          nextBtn.disabled === true ||
           nextBtn.hasAttribute("disabled") ||
           nextBtn.classList.contains("rs-disabled") ||
           nextBtn.getAttribute("aria-disabled") === "true";
@@ -587,6 +659,47 @@ const patterns = {
       },
       true
     );
+
+    // Re-add disabled immediately on click and re-evaluate upon step shift
+    document.addEventListener("click", (e) => {
+      const stepBtn = e.target.closest("[rs-step-btn]");
+      if (!stepBtn) return;
+
+      const isNext = stepBtn.getAttribute("rs-step-btn") === "next";
+
+      // If clicking an enabled shared Next button, immediately re-add disabled
+      // so it cannot be double-clicked before the next step is evaluated
+      if (isNext && !stepBtn.closest("[rs-form-step]")) {
+        applyDisabled(stepBtn);
+      }
+
+      // Re-evaluate step validity once external DOM changes / animations take effect
+      const recheck = () => {
+        stepElements.forEach((stepEl) => {
+          updateStepNextButton(stepEl);
+        });
+      };
+
+      setTimeout(recheck, 0);
+      setTimeout(recheck, 50);
+      setTimeout(recheck, 250);
+    });
+
+    // Setup MutationObserver on all steps to detect external step shifts (style, class, aria-hidden changes)
+    if (typeof MutationObserver !== "undefined" && stepElements.length > 0) {
+      const stepObserver = new MutationObserver(() => {
+        stepElements.forEach((stepEl) => {
+          updateStepNextButton(stepEl);
+        });
+      });
+
+      stepElements.forEach((stepEl) => {
+        stepObserver.observe(stepEl, {
+          attributes: true,
+          attributeFilter: ["style", "class", "aria-hidden"],
+        });
+      });
+    }
 
     // Setup input fields
     inputs.forEach((input) => {
@@ -643,7 +756,7 @@ const patterns = {
       const parentForm = stepEl.closest("form");
       if (parentForm) forms.add(parentForm);
 
-      // Explicitly initialize next button as disabled by default (or enabled if step is pre-filled and valid)
+      // Evaluate initial validity of step (removes disabled only if already valid)
       updateStepNextButton(stepEl);
 
       // Re-evaluate validity in real time on input and change
