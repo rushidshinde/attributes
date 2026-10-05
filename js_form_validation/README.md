@@ -102,6 +102,69 @@ Where to add:  Add this attribute to wrapper of the all checkbox fields
 
 ---
 
+## Multi-Step Form Validation
+
+Validate fields per step and automatically control the **Next** button. The next button is **disabled by default** and automatically enables once all required and validated fields in that step pass validation.
+
+### Step Wrapper
+```Required*```
+
+Name:
+```
+rs-form-step
+```
+value:
+```
+1
+```
+Where to add: Add this attribute to each step container wrapper (e.g. `rs-form-step="1"`, `rs-form-step="2"`).
+
+### Next Step Button
+```Required*```
+
+Name:
+```
+rs-step-btn
+```
+value:
+```
+next
+```
+Where to add: Add this attribute to the Next button of each step. It is disabled by default and automatically enables only when all fields within that step pass validation.
+
+### Example Multi-Step HTML
+```html
+<form rs-form-multistep="true">
+  <!-- Step 1 -->
+  <div rs-form-step="1">
+    <input type="text" rs-form-field="input" rs-form-type="text" required />
+    <input type="tel" rs-form-field="input" rs-form-type="contactNumber" required />
+    
+    <!-- Next button is disabled by default until Step 1 inputs are valid -->
+    <button type="button" rs-step-btn="next">Next</button>
+  </div>
+
+  <!-- Step 2 -->
+  <div rs-form-step="2">
+    <input type="email" rs-form-field="input" rs-form-type="businessEmail" required />
+    
+    <button type="button" rs-step-btn="next">Next</button>
+  </div>
+
+  <!-- Step 3 (Final) -->
+  <div rs-form-step="3">
+    <div rs-form-field="checkbox-wrapper" rs-checkbox-multi-select="true">
+      <input type="checkbox" name="services" value="1" />
+      <input type="checkbox" name="services" value="2" />
+    </div>
+    
+    <button type="submit">Submit Form</button>
+  </div>
+</form>
+```
+
+---
+
 ## Custom Styling with CSS Variables
 
 The custom error popup bubble automatically inherits default browser aesthetics and auto-resizes across screen sizes. You can easily override colors, font size, and background using CSS variables in your stylesheet:

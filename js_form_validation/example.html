@@ -327,6 +327,142 @@
     </form>
   </div>
 
+  <!-- Multi-Step Form Demonstration -->
+  <div class="form-container" style="margin-top: 32px;">
+    <div class="header">
+      <h1>Multi-Step Form Test</h1>
+      <p>Next button is disabled by default and automatically enables only when all fields in that step pass validation.</p>
+    </div>
+
+    <form id="multiStepForm" rs-form-multistep="true" action="javascript:alert('Multi-step form submitted successfully!');">
+      
+      <!-- Step 1 -->
+      <div rs-form-step="1" id="step1" style="display: block;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Step 1: Personal Details</div>
+        
+        <div class="form-group">
+          <div class="label-row">
+            <label for="step1Name">Full Name *</label>
+            <span class="attr-badge">rs-form-type="text"</span>
+          </div>
+          <input
+            id="step1Name"
+            type="text"
+            placeholder="John Doe"
+            rs-form-field="input"
+            rs-form-type="text"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <div class="label-row">
+            <label for="step1Phone">Contact Number *</label>
+            <span class="attr-badge">rs-form-type="contactNumber"</span>
+          </div>
+          <input
+            id="step1Phone"
+            type="tel"
+            placeholder="+1234567890"
+            rs-form-field="input"
+            rs-form-type="contactNumber"
+            required
+          />
+        </div>
+
+        <div class="btn-container">
+          <button
+            type="button"
+            class="btn-submit"
+            rs-step-btn="next"
+            onclick="document.getElementById('step1').style.display='none'; document.getElementById('step2').style.display='block';"
+          >
+            Next Step &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div rs-form-step="2" id="step2" style="display: none;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Step 2: Business Email</div>
+        
+        <div class="form-group">
+          <div class="label-row">
+            <label for="step2Email">Work / Business Email *</label>
+            <span class="attr-badge">rs-form-type="businessEmail"</span>
+          </div>
+          <input
+            id="step2Email"
+            type="email"
+            placeholder="alex@company.com"
+            rs-form-field="input"
+            rs-form-type="businessEmail"
+            required
+          />
+          <span class="hint">Public domains like gmail.com are disallowed</span>
+        </div>
+
+        <div class="btn-container">
+          <button
+            type="button"
+            class="btn-reset"
+            onclick="document.getElementById('step2').style.display='none'; document.getElementById('step1').style.display='block';"
+          >
+            &larr; Back
+          </button>
+          <button
+            type="button"
+            class="btn-submit"
+            rs-step-btn="next"
+            onclick="document.getElementById('step2').style.display='none'; document.getElementById('step3').style.display='block';"
+          >
+            Next Step &rarr;
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div rs-form-step="3" id="step3" style="display: none;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.05em;">Step 3: Verification & Submit</div>
+        
+        <div class="form-group">
+          <div class="label-row">
+            <label>Select at least one service *</label>
+            <span class="attr-badge">rs-checkbox-multi-select="true"</span>
+          </div>
+          <div
+            class="checkbox-group-wrapper"
+            rs-form-field="checkbox-wrapper"
+            rs-checkbox-multi-select="true"
+          >
+            <label class="checkbox-item">
+              <input type="checkbox" name="stepServices" value="cloud" />
+              <span>Cloud Hosting</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" name="stepServices" value="security" />
+              <span>Cybersecurity</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-container">
+          <button
+            type="button"
+            class="btn-reset"
+            onclick="document.getElementById('step3').style.display='none'; document.getElementById('step2').style.display='block';"
+          >
+            &larr; Back
+          </button>
+          <button type="submit" class="btn-submit">
+            Complete Submission
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
+
   <!-- Include the validation script -->
   <script src="./validation_script.js"></script>
 

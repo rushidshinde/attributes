@@ -159,6 +159,13 @@ const patterns = {
       .rs-input-invalid {
         border-color: var(--rs-input-invalid-border, #d93025) !important;
       }
+
+      /* Disabled Next Button for multi-step forms */
+      [rs-step-btn="next"]:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
     `;
     document.head.appendChild(style);
   };
@@ -427,7 +434,67 @@ const patterns = {
   };
 
   /**
-   * Initializes all inputs, checkbox groups, and forms.
+   * Validates all input fields and checkbox wrappers within a specific step container.
+   * @param {HTMLElement} stepEl
+   * @returns {boolean}
+   */
+  const validateStepFields = (stepEl) => {
+    const inputs = stepEl.querySelectorAll('[rs-form-field="input"]');
+    for (let i = 0; i < inputs.length; i++) {
+      const result = validateInputElement(inputs[i]);
+      if (!result.isValid) return false;
+    }
+
+    const checkboxWrappers = stepEl.querySelectorAll(
+      '[rs-form-field="checkbox-wrapper"][rs-checkbox-multi-select="true"]'
+    );
+    for (let i = 0; i < checkboxWrappers.length; i++) {
+      const result = validateCheckboxWrapper(checkboxWrappers[i]);
+      if (!result.isValid) return false;
+    }
+
+    return true;
+  };
+
+  /**
+   * Finds the Next button associated with a step container.
+   * Checks inside the step container first, then inside the parent form matching step attribute.
+   * @param {HTMLElement} stepEl
+   * @returns {HTMLElement|null}
+   */
+  const getStepNextButton = (stepEl) => {
+    const directBtn = stepEl.querySelector('[rs-step-btn="next"]');
+    if (directBtn) return directBtn;
+
+    const stepVal = stepEl.getAttribute("rs-form-step");
+    const parentForm = stepEl.closest("form");
+    if (parentForm && stepVal) {
+      const linkedBtn = parentForm.querySelector(`[rs-step-btn="next"][rs-form-step="${stepVal}"]`);
+      if (linkedBtn) return linkedBtn;
+    }
+
+    return null;
+  };
+
+  /**
+   * Updates the disabled state of the Next button for a step based on its validity.
+   * @param {HTMLElement} stepEl
+   */
+  const updateStepNextButton = (stepEl) => {
+    const nextBtn = getStepNextButton(stepEl);
+    if (!nextBtn) return;
+
+    const isValid = validateStepFields(stepEl);
+    nextBtn.disabled = !isValid;
+    if (!isValid) {
+      nextBtn.setAttribute("disabled", "true");
+    } else {
+      nextBtn.removeAttribute("disabled");
+    }
+  };
+
+  /**
+   * Initializes all inputs, checkbox groups, multi-step containers, and forms.
    */
   const initValidation = () => {
     RSBubbleManager.init();
@@ -436,6 +503,7 @@ const patterns = {
     const checkboxWrappers = document.querySelectorAll(
       '[rs-form-field="checkbox-wrapper"][rs-checkbox-multi-select="true"]'
     );
+    const stepElements = document.querySelectorAll("[rs-form-step]");
 
     // Track unique forms to attach submit listeners
     const forms = new Set();
@@ -490,6 +558,24 @@ const patterns = {
       });
     });
 
+    // Setup multi-step form steps & next button enablement
+    stepElements.forEach((stepEl) => {
+      const parentForm = stepEl.closest("form");
+      if (parentForm) forms.add(parentForm);
+
+      // Initialize next button state (disabled by default until all fields pass)
+      updateStepNextButton(stepEl);
+
+      // Re-evaluate validity on input or change within this step
+      stepEl.addEventListener("input", () => {
+        updateStepNextButton(stepEl);
+      });
+
+      stepEl.addEventListener("change", () => {
+        updateStepNextButton(stepEl);
+      });
+    });
+
     // Intercept form submit
     forms.forEach((form) => {
       // Disable default browser tooltips on the form
@@ -524,6 +610,9 @@ const patterns = {
         RSBubbleManager.hide();
         form.querySelectorAll(".rs-input-invalid").forEach((el) => {
           el.classList.remove("rs-input-invalid");
+        });
+        form.querySelectorAll("[rs-form-step]").forEach((stepEl) => {
+          setTimeout(() => updateStepNextButton(stepEl), 10);
         });
       });
     });
