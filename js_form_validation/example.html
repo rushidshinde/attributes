@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JS Form Validation Attributes - Test Example</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --focus-ring: rgba(59, 130, 246, 0.4);
+      --badge-bg: #0f172a;
+      --badge-text: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .form-container {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 580px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .attr-badge {
+      font-size: 0.72rem;
+      font-family: Consolas, Monaco, monospace;
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid #1e3a8a;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 10px 14px;
+      background-color: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #f8fafc;
+      font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--focus-ring);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .checkbox-group-wrapper {
+      background-color: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 4px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.88rem;
+      color: #cbd5e1;
+      cursor: pointer;
+    }
+
+    .checkbox-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .btn-container {
+      display: flex;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 18px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-submit {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .btn-reset {
+      background-color: #334155;
+      color: #cbd5e1;
+    }
+
+    .btn-reset:hover {
+      background-color: #475569;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <div class="header">
+      <h1>Form Validation Test Suite</h1>
+      <p>Test regex patterns, custom errors, business email restrictions, and multi-select checkboxes.</p>
+    </div>
+
+    <form id="testValidationForm" action="javascript:alert('Form submitted successfully!');">
+
+      <!-- 1. Text Only Field -->
+      <div class="form-group">
+        <div class="label-row">
+          <label for="fullName">Full Name</label>
+          <span class="attr-badge">rs-form-type="text"</span>
+        </div>
+        <input
+          id="fullName"
+          type="text"
+          name="fullName"
+          placeholder="e.g. John Doe"
+          rs-form-field="input"
+          rs-form-type="text"
+          rs-form-error="Please enter alphabets only (no numbers or special characters)"
+          required
+        />
+        <span class="hint">Disallows numbers and special characters</span>
+      </div>
+
+      <!-- 2. Business Email Field -->
+      <div class="form-group">
+        <div class="label-row">
+          <label for="businessEmail">Work / Business Email</label>
+          <span class="attr-badge">rs-form-type="businessEmail"</span>
+        </div>
+        <input
+          id="businessEmail"
+          type="email"
+          name="businessEmail"
+          placeholder="e.g. alex@company.com"
+          rs-form-field="input"
+          rs-form-type="businessEmail"
+          rs-form-error="Please enter a corporate email. Public domains (gmail, yahoo, etc.) are disallowed."
+          required
+        />
+        <span class="hint">Blocks free email providers like gmail.com, yahoo.com, outlook.com</span>
+      </div>
+
+      <!-- 3. Standard Email Field -->
+      <div class="form-group">
+        <div class="label-row">
+          <label for="personalEmail">Personal / Standard Email</label>
+          <span class="attr-badge">rs-form-type="email"</span>
+        </div>
+        <input
+          id="personalEmail"
+          type="email"
+          name="personalEmail"
+          placeholder="e.g. user@example.com"
+          rs-form-field="input"
+          rs-form-type="email"
+          rs-form-error="Please enter a valid email address"
+        />
+        <span class="hint">Standard email pattern validation</span>
+      </div>
+
+      <!-- 4. Contact Number Field -->
+      <div class="form-group">
+        <div class="label-row">
+          <label for="contactNumber">Contact Number</label>
+          <span class="attr-badge">rs-form-type="contactNumber"</span>
+        </div>
+        <input
+          id="contactNumber"
+          type="tel"
+          name="contactNumber"
+          placeholder="e.g. +1234567890"
+          rs-form-field="input"
+          rs-form-type="contactNumber"
+          rs-form-error="Enter a valid phone number (6 to 14 digits, optional leading +)"
+          required
+        />
+        <span class="hint">Validates 6 to 14 digits with optional +</span>
+      </div>
+
+      <!-- 5. Custom Pattern Field -->
+      <div class="form-group">
+        <div class="label-row">
+          <label for="customCode">Custom Code (e.g. 4 uppercase letters + 3 digits)</label>
+          <span class="attr-badge">rs-form-pattern="^[A-Z]{4}[0-9]{3}$"</span>
+        </div>
+        <input
+          id="customCode"
+          type="text"
+          name="customCode"
+          placeholder="e.g. ABCD123"
+          rs-form-field="input"
+          rs-form-pattern="^[A-Z]{4}[0-9]{3}$"
+          rs-form-error="Code must be 4 uppercase letters followed by 3 numbers (e.g. ABCD123)"
+        />
+        <span class="hint">Demonstrates custom regex pattern override</span>
+      </div>
+
+      <!-- 6. Multi-Select Checkboxes Group -->
+      <div class="form-group">
+        <div class="label-row">
+          <label>Preferred Services (Select at least one)</label>
+          <span class="attr-badge">rs-checkbox-multi-select="true"</span>
+        </div>
+        <div
+          class="checkbox-group-wrapper"
+          rs-form-field="checkbox-wrapper"
+          rs-checkbox-multi-select="true"
+        >
+          <label class="checkbox-item">
+            <input type="checkbox" name="services" value="design" />
+            <span>UI/UX Design</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="services" value="development" />
+            <span>Web Development</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="services" value="seo" />
+            <span>SEO & Analytics</span>
+          </label>
+        </div>
+        <span class="hint">Multi-select checkbox group requires at least one option</span>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="btn-container">
+        <button type="reset" class="btn-reset">Reset</button>
+        <button type="submit" class="btn-submit">Submit Form</button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Include the validation script -->
+  <script src="./validation_script.js"></script>
+
+</body>
+</html>
