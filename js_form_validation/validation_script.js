@@ -161,10 +161,12 @@ const patterns = {
       }
 
       /* Disabled Next Button for multi-step forms */
-      [rs-step-btn="next"]:disabled {
-        opacity: 0.55;
-        cursor: not-allowed;
-        pointer-events: none;
+      [rs-step-btn="next"]:disabled,
+      [rs-step-btn="next"][disabled],
+      [rs-step-btn="next"].rs-disabled {
+        opacity: 0.55 !important;
+        cursor: not-allowed !important;
+        pointer-events: none !important;
       }
     `;
     document.head.appendChild(style);
@@ -434,15 +436,55 @@ const patterns = {
   };
 
   /**
+   * Sets the disabled state on a button or element (supporting button, input, a, div).
+   * @param {HTMLElement} btn
+   * @param {boolean} isDisabled
+   */
+  const setButtonDisabledState = (btn, isDisabled) => {
+    if (!btn) return;
+
+    if (btn.tagName === "BUTTON" || btn.tagName === "INPUT") {
+      btn.disabled = isDisabled;
+    }
+
+    if (isDisabled) {
+      btn.setAttribute("disabled", "true");
+      btn.setAttribute("aria-disabled", "true");
+      btn.classList.add("rs-disabled");
+    } else {
+      btn.removeAttribute("disabled");
+      btn.removeAttribute("aria-disabled");
+      btn.classList.remove("rs-disabled");
+    }
+  };
+
+  /**
    * Validates all input fields and checkbox wrappers within a specific step container.
+   * Only fields marked as required must be filled; any filled field must pass pattern checks.
    * @param {HTMLElement} stepEl
    * @returns {boolean}
    */
   const validateStepFields = (stepEl) => {
     const inputs = stepEl.querySelectorAll('[rs-form-field="input"]');
     for (let i = 0; i < inputs.length; i++) {
-      const result = validateInputElement(inputs[i]);
-      if (!result.isValid) return false;
+      const input = inputs[i];
+      const value = (input.value || "").trim();
+
+      const isRequired =
+        input.required ||
+        input.hasAttribute("required") ||
+        input.getAttribute("rs-form-required") === "true";
+
+      // If marked required, it must not be empty
+      if (isRequired && value.length === 0) {
+        return false;
+      }
+
+      // If field has a value (whether required or optional), it must pass pattern/domain validation
+      if (value.length > 0) {
+        const result = validateInputElement(input);
+        if (!result.isValid) return false;
+      }
     }
 
     const checkboxWrappers = stepEl.querySelectorAll(
@@ -457,23 +499,40 @@ const patterns = {
   };
 
   /**
-   * Finds the Next button associated with a step container.
-   * Checks inside the step container first, then inside the parent form matching step attribute.
+   * Finds all Next buttons associated with a step container.
+   * Supports buttons nested at any depth inside the step, explicitly linked by step attribute,
+   * or shared in the parent form footer.
    * @param {HTMLElement} stepEl
-   * @returns {HTMLElement|null}
+   * @returns {HTMLElement[]}
    */
-  const getStepNextButton = (stepEl) => {
-    const directBtn = stepEl.querySelector('[rs-step-btn="next"]');
-    if (directBtn) return directBtn;
+  const getStepNextButtons = (stepEl) => {
+    const buttons = new Set();
 
+    // 1. Next buttons located anywhere inside this step container (at any nesting depth)
+    stepEl.querySelectorAll('[rs-step-btn="next"]').forEach((btn) => buttons.add(btn));
+
+    // 2. Next buttons in the parent form explicitly linked to this step index/value
     const stepVal = stepEl.getAttribute("rs-form-step");
     const parentForm = stepEl.closest("form");
     if (parentForm && stepVal) {
-      const linkedBtn = parentForm.querySelector(`[rs-step-btn="next"][rs-form-step="${stepVal}"]`);
-      if (linkedBtn) return linkedBtn;
+      parentForm
+        .querySelectorAll(
+          `[rs-step-btn="next"][rs-form-step="${stepVal}"], [rs-step-btn="next"][rs-step-target="${stepVal}"]`
+        )
+        .forEach((btn) => buttons.add(btn));
     }
 
-    return null;
+    // 3. Shared Next buttons in the parent form footer (outside all step wrappers)
+    if (buttons.size === 0 && parentForm) {
+      const allNextBtns = parentForm.querySelectorAll('[rs-step-btn="next"]');
+      allNextBtns.forEach((btn) => {
+        if (!btn.closest("[rs-form-step]")) {
+          buttons.add(btn);
+        }
+      });
+    }
+
+    return Array.from(buttons);
   };
 
   /**
@@ -481,16 +540,13 @@ const patterns = {
    * @param {HTMLElement} stepEl
    */
   const updateStepNextButton = (stepEl) => {
-    const nextBtn = getStepNextButton(stepEl);
-    if (!nextBtn) return;
+    const nextBtns = getStepNextButtons(stepEl);
+    if (nextBtns.length === 0) return;
 
     const isValid = validateStepFields(stepEl);
-    nextBtn.disabled = !isValid;
-    if (!isValid) {
-      nextBtn.setAttribute("disabled", "true");
-    } else {
-      nextBtn.removeAttribute("disabled");
-    }
+    nextBtns.forEach((btn) => {
+      setButtonDisabledState(btn, !isValid);
+    });
   };
 
   /**
@@ -503,10 +559,34 @@ const patterns = {
     const checkboxWrappers = document.querySelectorAll(
       '[rs-form-field="checkbox-wrapper"][rs-checkbox-multi-select="true"]'
     );
+    // Find all steps regardless of nesting depth inside forms
     const stepElements = document.querySelectorAll("[rs-form-step]");
 
     // Track unique forms to attach submit listeners
     const forms = new Set();
+
+    // Prevent clicks on disabled Next buttons in capture phase (supports <button>, <a>, <div>)
+    document.addEventListener(
+      "click",
+      (e) => {
+        const nextBtn = e.target.closest('[rs-step-btn="next"]');
+        if (!nextBtn) return;
+
+        const isBtnDisabled =
+          nextBtn.disabled ||
+          nextBtn.hasAttribute("disabled") ||
+          nextBtn.classList.contains("rs-disabled") ||
+          nextBtn.getAttribute("aria-disabled") === "true";
+
+        if (isBtnDisabled) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+          return false;
+        }
+      },
+      true
+    );
 
     // Setup input fields
     inputs.forEach((input) => {
@@ -563,10 +643,10 @@ const patterns = {
       const parentForm = stepEl.closest("form");
       if (parentForm) forms.add(parentForm);
 
-      // Initialize next button state (disabled by default until all fields pass)
+      // Explicitly initialize next button as disabled by default (or enabled if step is pre-filled and valid)
       updateStepNextButton(stepEl);
 
-      // Re-evaluate validity on input or change within this step
+      // Re-evaluate validity in real time on input and change
       stepEl.addEventListener("input", () => {
         updateStepNextButton(stepEl);
       });
