@@ -237,8 +237,18 @@ const patterns = {
     show(targetEl, message) {
       if (!this.bubbleEl) this.init();
 
+      const isAlreadyShowingSame =
+        this.currentTarget === targetEl &&
+        this.bubbleEl.classList.contains("rs-visible") &&
+        this.bubbleEl.style.display !== "none";
+
       this.currentTarget = targetEl;
       this.messageEl.textContent = message;
+
+      if (isAlreadyShowingSame) {
+        this.updatePosition();
+        return;
+      }
 
       this.bubbleEl.style.display = "flex";
       this.updatePosition();
@@ -404,6 +414,64 @@ const patterns = {
     }
 
     return { isValid: true, message: "" };
+  };
+
+  /**
+   * Updates validation state and error UI for a single input element.
+   * @param {HTMLInputElement} inputEl
+   * @param {boolean} isUserTyping - true when triggered via 'input' event
+   * @returns {boolean} isValid
+   */
+  const updateInputValidation = (inputEl, isUserTyping = false) => {
+    const isTouched =
+      inputEl.getAttribute("data-rs-touched") === "true" ||
+      inputEl.classList.contains("rs-input-invalid");
+
+    const result = validateInputElement(inputEl);
+
+    if (result.isValid) {
+      inputEl.classList.remove("rs-input-invalid");
+      if (RSBubbleManager.currentTarget === inputEl) {
+        RSBubbleManager.hide();
+      }
+    } else {
+      if (isTouched || !isUserTyping) {
+        inputEl.setAttribute("data-rs-touched", "true");
+        inputEl.classList.add("rs-input-invalid");
+        RSBubbleManager.show(inputEl, result.message);
+      }
+    }
+
+    return result.isValid;
+  };
+
+  /**
+   * Updates validation state and error UI for a checkbox wrapper.
+   * @param {HTMLElement} wrapper
+   * @param {boolean} isUserInteracting
+   * @returns {boolean} isValid
+   */
+  const updateCheckboxWrapperValidation = (wrapper, isUserInteracting = false) => {
+    const isTouched =
+      wrapper.getAttribute("data-rs-touched") === "true" ||
+      wrapper.classList.contains("rs-input-invalid");
+
+    const result = validateCheckboxWrapper(wrapper);
+
+    if (result.isValid) {
+      wrapper.classList.remove("rs-input-invalid");
+      if (RSBubbleManager.currentTarget === wrapper) {
+        RSBubbleManager.hide();
+      }
+    } else {
+      if (isTouched || !isUserInteracting) {
+        wrapper.setAttribute("data-rs-touched", "true");
+        wrapper.classList.add("rs-input-invalid");
+        RSBubbleManager.show(wrapper, result.message);
+      }
+    }
+
+    return result.isValid;
   };
 
   /**
@@ -708,24 +776,32 @@ const patterns = {
       // Suppress native browser bubbles
       input.addEventListener("invalid", (e) => e.preventDefault());
 
-      // Dismiss bubble and error highlight as soon as user types
+      // Validate in real time as user updates the field
       input.addEventListener("input", () => {
-        input.classList.remove("rs-input-invalid");
-        if (RSBubbleManager.currentTarget === input) {
-          RSBubbleManager.hide();
+        updateInputValidation(input, true);
+      });
+
+      // Validate when user commits / blurs the field
+      input.addEventListener("change", () => {
+        updateInputValidation(input, false);
+      });
+
+      // Ensure validation is verified on blur if touched or non-empty
+      input.addEventListener("blur", () => {
+        if (
+          input.getAttribute("data-rs-touched") === "true" ||
+          (input.value || "").trim().length > 0
+        ) {
+          updateInputValidation(input, false);
         }
       });
 
-      // Validate on change / blur
-      input.addEventListener("change", () => {
-        const result = validateInputElement(input);
-        if (!result.isValid) {
-          input.classList.add("rs-input-invalid");
-          RSBubbleManager.show(input, result.message);
-        } else {
-          input.classList.remove("rs-input-invalid");
-          if (RSBubbleManager.currentTarget === input) {
-            RSBubbleManager.hide();
+      // Re-show error bubble if field is already in invalid state upon focus
+      input.addEventListener("focus", () => {
+        if (input.classList.contains("rs-input-invalid")) {
+          const result = validateInputElement(input);
+          if (!result.isValid) {
+            RSBubbleManager.show(input, result.message);
           }
         }
       });
@@ -738,15 +814,8 @@ const patterns = {
 
       const checkboxes = wrapper.querySelectorAll('input[type="checkbox"]');
       checkboxes.forEach((cb) => {
-        // Dismiss error when user checks any box
         cb.addEventListener("change", () => {
-          const result = validateCheckboxWrapper(wrapper);
-          if (result.isValid) {
-            wrapper.classList.remove("rs-input-invalid");
-            if (RSBubbleManager.currentTarget === wrapper) {
-              RSBubbleManager.hide();
-            }
-          }
+          updateCheckboxWrapperValidation(wrapper, false);
         });
       });
     });
@@ -775,6 +844,16 @@ const patterns = {
       form.noValidate = true;
 
       form.addEventListener("submit", (e) => {
+        // Mark all fields as touched upon submit attempt so real-time feedback is active
+        form.querySelectorAll('[rs-form-field="input"]').forEach((input) => {
+          input.setAttribute("data-rs-touched", "true");
+        });
+        form.querySelectorAll(
+          '[rs-form-field="checkbox-wrapper"][rs-checkbox-multi-select="true"]'
+        ).forEach((wrapper) => {
+          wrapper.setAttribute("data-rs-touched", "true");
+        });
+
         const result = validateForm(form);
         if (!result.isValid) {
           e.preventDefault();
@@ -801,8 +880,13 @@ const patterns = {
 
       form.addEventListener("reset", () => {
         RSBubbleManager.hide();
-        form.querySelectorAll(".rs-input-invalid").forEach((el) => {
-          el.classList.remove("rs-input-invalid");
+        form.querySelectorAll('[rs-form-field="input"]').forEach((input) => {
+          input.classList.remove("rs-input-invalid");
+          input.removeAttribute("data-rs-touched");
+        });
+        form.querySelectorAll('[rs-form-field="checkbox-wrapper"]').forEach((wrapper) => {
+          wrapper.classList.remove("rs-input-invalid");
+          wrapper.removeAttribute("data-rs-touched");
         });
         form.querySelectorAll("[rs-form-step]").forEach((stepEl) => {
           setTimeout(() => updateStepNextButton(stepEl), 10);
